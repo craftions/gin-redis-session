@@ -1,6 +1,7 @@
 package sessions
 
 import (
+	"fmt"
 	"log"
 	"net/http"
 
@@ -49,7 +50,7 @@ type Session interface {
 func Sessions(name string, store Store) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		s := &session{name, c.Request, store, nil, false, c.Writer}
-		c.Set(DefaultKey, s)
+		c.Set(getKeyName(name), s)
 		defer context.Clear(c.Request)
 		c.Next()
 	}
@@ -141,12 +142,11 @@ func (s *session) Written() bool {
 	return s.written
 }
 
-// shortcut to get session
-func Default(c *gin.Context) Session {
-	return c.MustGet(DefaultKey).(Session)
+func getKeyName(name string) string {
+	return fmt.Sprintf("%s-%s", DefaultKey, name)
 }
 
-// shortcut to get session with given name
-func DefaultMany(c *gin.Context, name string) Session {
-	return c.MustGet(DefaultKey).(map[string]Session)[name]
+// shortcut to get session
+func Default(name string, c *gin.Context) Session {
+	return c.MustGet(getKeyName(name)).(Session)
 }
