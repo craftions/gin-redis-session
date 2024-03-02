@@ -28,14 +28,14 @@ func GetSet(t *testing.T, newStore storeFactory) {
 	r.Use(sessions.Sessions(sessionName, newStore(t)))
 
 	r.GET("/set", func(c *gin.Context) {
-		session := sessions.Default("demo", c)
+		session := sessions.Get("demo", c)
 		session.Set("key", ok)
 		_ = session.Save()
 		c.String(http.StatusOK, ok)
 	})
 
 	r.GET("/get", func(c *gin.Context) {
-		session := sessions.Default("demo", c)
+		session := sessions.Get("demo", c)
 		if session.Get("key") != ok {
 			t.Error("Session writing failed")
 		}
@@ -58,21 +58,21 @@ func DeleteKey(t *testing.T, newStore storeFactory) {
 	r.Use(sessions.Sessions(sessionName, newStore(t)))
 
 	r.GET("/set", func(c *gin.Context) {
-		session := sessions.Default("demo", c)
+		session := sessions.Get("demo", c)
 		session.Set("key", ok)
 		_ = session.Save()
 		c.String(http.StatusOK, ok)
 	})
 
 	r.GET("/delete", func(c *gin.Context) {
-		session := sessions.Default("demo", c)
+		session := sessions.Get("demo", c)
 		session.Delete("key")
 		_ = session.Save()
 		c.String(http.StatusOK, ok)
 	})
 
 	r.GET("/get", func(c *gin.Context) {
-		session := sessions.Default("demo", c)
+		session := sessions.Get("demo", c)
 		if session.Get("key") != nil {
 			t.Error("Session deleting failed")
 		}
@@ -101,14 +101,14 @@ func Flashes(t *testing.T, newStore storeFactory) {
 	r.Use(sessions.Sessions(sessionName, store))
 
 	r.GET("/set", func(c *gin.Context) {
-		session := sessions.Default("demo", c)
+		session := sessions.Get("demo", c)
 		session.AddFlash(ok)
 		_ = session.Save()
 		c.String(http.StatusOK, ok)
 	})
 
 	r.GET("/flash", func(c *gin.Context) {
-		session := sessions.Default("demo", c)
+		session := sessions.Get("demo", c)
 		l := len(session.Flashes())
 		if l != 1 {
 			t.Error("Flashes count does not equal 1. Equals ", l)
@@ -118,7 +118,7 @@ func Flashes(t *testing.T, newStore storeFactory) {
 	})
 
 	r.GET("/check", func(c *gin.Context) {
-		session := sessions.Default("demo", c)
+		session := sessions.Get("demo", c)
 		l := len(session.Flashes())
 		if l != 0 {
 			t.Error("flashes count is not 0 after reading. Equals ", l)
@@ -152,7 +152,7 @@ func Clear(t *testing.T, newStore storeFactory) {
 	r.Use(sessions.Sessions(sessionName, store))
 
 	r.GET("/set", func(c *gin.Context) {
-		session := sessions.Default("demo", c)
+		session := sessions.Get("demo", c)
 		for k, v := range data {
 			session.Set(k, v)
 		}
@@ -162,7 +162,7 @@ func Clear(t *testing.T, newStore storeFactory) {
 	})
 
 	r.GET("/check", func(c *gin.Context) {
-		session := sessions.Default("demo", c)
+		session := sessions.Get("demo", c)
 		for k, v := range data {
 			if session.Get(k) == v {
 				t.Fatal("Session clear failed")
@@ -191,7 +191,7 @@ func Options(t *testing.T, newStore storeFactory) {
 	r.Use(sessions.Sessions(sessionName, store))
 
 	r.GET("/domain", func(c *gin.Context) {
-		session := sessions.Default("demo", c)
+		session := sessions.Get("demo", c)
 		session.Set("key", ok)
 		session.Options(sessions.Options{
 			Path: "/foo/bar/bat",
@@ -200,19 +200,19 @@ func Options(t *testing.T, newStore storeFactory) {
 		c.String(http.StatusOK, ok)
 	})
 	r.GET("/path", func(c *gin.Context) {
-		session := sessions.Default("demo", c)
+		session := sessions.Get("demo", c)
 		session.Set("key", ok)
 		_ = session.Save()
 		c.String(http.StatusOK, ok)
 	})
 	r.GET("/set", func(c *gin.Context) {
-		session := sessions.Default("demo", c)
+		session := sessions.Get("demo", c)
 		session.Set("key", ok)
 		_ = session.Save()
 		c.String(http.StatusOK, ok)
 	})
 	r.GET("/expire", func(c *gin.Context) {
-		session := sessions.Default("demo", c)
+		session := sessions.Get("demo", c)
 		session.Options(sessions.Options{
 			MaxAge: -1,
 		})
@@ -220,7 +220,7 @@ func Options(t *testing.T, newStore storeFactory) {
 		c.String(http.StatusOK, ok)
 	})
 	r.GET("/check", func(c *gin.Context) {
-		session := sessions.Default("demo", c)
+		session := sessions.Get("demo", c)
 		val := session.Get("key")
 		if val != nil {
 			t.Fatal("Session expiration failed")
