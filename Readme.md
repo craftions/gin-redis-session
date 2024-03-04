@@ -37,7 +37,7 @@ func main() {
   r.Use(sessions.Sessions("mysession", store))
 
   r.GET("/incr", func(c *gin.Context) {
-    session := sessions.Default(c)
+    session := sessions.Default("mysession", c)
     var count int
     v := session.Get("count")
     if v == nil {
